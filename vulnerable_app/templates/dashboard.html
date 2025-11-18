@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid">
+  <div class="card">
+    <h2>Analyzer Dashboard</h2>
+    <div class="section">
+      <form method="POST" action="/run_analyzer">
+        <label for="target">Target Base URL</label>
+        <input id="target" name="target" value="{{ target_default }}" placeholder="http://127.0.0.1:5000" />
+
+        <label for="source_dir" style="margin-top:10px;">Source Directory</label>
+        <input id="source_dir" name="source_dir" value="{{ source_default }}" placeholder="vulnerable_app" />
+
+        <label for="dump" style="margin-top:10px;">Database Dump File</label>
+        <input id="dump" name="dump" list="dump-list" value="seed_data/users_dump.sql" />
+        <datalist id="dump-list">
+          {% for d in dumps %}
+          <option value="{{ d }}"></option>
+          {% endfor %}
+        </datalist>
+
+        <label for="out_dir" style="margin-top:10px;">Output Directory</label>
+        <input id="out_dir" name="out_dir" value="{{ out_default }}" placeholder="reports" />
+
+        <div class="row" style="margin-top:12px;">
+          <label><input type="checkbox" name="html" checked /> Generate HTML report</label>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button class="btn" type="submit">Run Analyzer</button>
+          <a class="btn" href="/view_report" target="_blank" style="background:#22c55e;">Open Latest Report</a>
+        </div>
+        <div class="note">Use the list to pick a dump file. SQL dumps are parsed for INSERT/UPDATE password fields.</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Tips</h2>
+    <div class="section">
+      <ul>
+        <li>Start the app, then run the analyzer against <code class="code">{{ target_default }}</code>.</li>
+        <li>Pick <code class="code">seed_data/users_dump.sql</code> for SQL-based dump audit.</li>
+        <li>Reports are written to <code class="code">{{ out_default }}</code>. Use "Open Latest Report" after running.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{
+  "severity": "CRITICAL",
+  "score": 100,
+  "reason": "DAST found 2 potential SQLi vectors. SAST found 2 insecure patterns linked to parameters. Dump shows 4 password hashes with varying strengths.",
+  "dast": [
+    {
+      "url": "http://127.0.0.1:5000/search?q=test%27",
+      "param": "q",
+      "technique": "error",
+      "response_code": 500,
+      "response_time_ms": 10,
+      "evidence": "HTTP 500 on error payload"
+    },
+    {
+      "url": "http://127.0.0.1:5000/item?id=1%27",
+      "param": "id",
+      "technique": "error",
+      "response_code": 500,
+      "response_time_ms": 12,
+      "evidence": "HTTP 500 on error payload"
+    }
+  ],
+  "sast": [
+    {
+      "file": "vulnerable_app\\app.py",
+      "line": 154,
+      "issue": "SQL query built via f-string",
+      "severity": "HIGH",
+      "code_snippet": "rows = c.execute(f\"SELECT user FROM users WHERE user LIKE '%{q}%' \").fetchall()",
+      "param": null
+    },
+    {
+      "file": "vulnerable_app\\app.py",
+      "line": 164,
+      "issue": "SQL query built via string concat/format",
+      "severity": "HIGH",
+      "code_snippet": "rows = c.execute(\"SELECT user FROM users WHERE id = \" + item_id_raw).fetchall()",
+      "param": null
+    }
+  ],
+  "dump": [
+    {
+      "line_no": 2,
+      "hash_sample": "21232f297a57a5a743894a0e4a801fc3",
+      "format": "MD5",
+      "severity": "CRITICAL"
+    },
+    {
+      "line_no": 2,
+      "hash_sample": "da4b9237bacccdf19c0760cab7aec4a8359010b0",
+      "format": "SHA1",
+      "severity": "HIGH"
+    },
+    {
+      "line_no": 2,
+      "hash_sample": "$2b$12$C6UzMDM.H6dfI/f/IKxGhuYb8RZ8a6Z5S9YLeuYf1b9QZ/ZuQn66.",
+      "format": "bcrypt",
+      "severity": "MEDIUM"
+    },
+    {
+      "line_no": 2,
+      "hash_sample": "$argon2id$v=19$m=65536,t=3,p=4$Wm9tYmllU2FsdA$K1bPq8Cq3ZJXzRys3vYUvA",
+      "format": "Argon2",
+      "severity": "LOW"
+    }
+  ]
+}

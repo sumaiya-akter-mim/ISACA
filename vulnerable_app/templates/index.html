@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid">
+  <div class="card">
+    <h2>Search Users (GET /search)</h2>
+    <div class="section">
+      <label for="search-q">Query (q)</label>
+      <div class="row">
+        <input id="search-q" placeholder="e.g., test" />
+        <button class="btn" onclick="runSearch()">Search</button>
+      </div>
+      <div class="note">This endpoint is intentionally vulnerable to SQL injection via string concatenation.</div>
+      <h3 class="muted">Response</h3>
+      <pre id="search-out" class="code">(results will appear here)</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Lookup Item (GET /item)</h2>
+    <div class="section">
+      <label for="item-id">Item ID (id)</label>
+      <div class="row">
+        <input id="item-id" placeholder="e.g., 1" />
+        <button class="btn" onclick="runItem()">Lookup</button>
+      </div>
+      <div class="note">This endpoint uses f-strings in SQL and is vulnerable to injection.</div>
+      <h3 class="muted">Response</h3>
+      <pre id="item-out" class="code">(results will appear here)</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Dummy Login (GET /login)</h2>
+    <div class="section">
+      <label for="login-user">User</label>
+      <input id="login-user" placeholder="e.g., alice" />
+      <label for="login-pass" style="margin-top:8px;">Password</label>
+      <div class="row">
+        <input id="login-pass" placeholder="e.g., password" />
+        <button class="btn" onclick="runLogin()">Login</button>
+      </div>
+      <div class="note">This route uses insecure plaintext handling on purpose.</div>
+      <h3 class="muted">Response</h3>
+      <pre id="login-out" class="code">(results will appear here)</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Health Check</h2>
+    <div class="section">
+      <button class="btn" onclick="runHealth()">Ping /health</button>
+      <h3 class="muted" style="margin-top:10px;">Response</h3>
+      <pre id="health-out" class="code">(results will appear here)</pre>
+      <div class="note">Use this to verify the server is up.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function fetchAndPrint(url, outEl) {
+  try {
+    const res = await fetch(url);
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('application/json')) {
+      const json = await res.json();
+      outEl.textContent = JSON.stringify(json, null, 2);
+    } else {
+      const text = await res.text();
+      outEl.textContent = text;
+    }
+    if (!res.ok) {
+      outEl.textContent = `${res.status} ${res.statusText}\n` + outEl.textContent;
+    }
+  } catch (e) {
+    outEl.textContent = String(e);
+  }
+}
+
+async function runSearch() {
+  const q = document.getElementById('search-q').value || '';
+  const out = document.getElementById('search-out');
+  fetchAndPrint(`/search?q=${encodeURIComponent(q)}`, out);
+}
+
+async function runItem() {
+  const id = document.getElementById('item-id').value || '1';
+  const out = document.getElementById('item-out');
+  fetchAndPrint(`/item?id=${encodeURIComponent(id)}`, out);
+}
+
+async function runLogin() {
+  const user = document.getElementById('login-user').value || '';
+  const pass = document.getElementById('login-pass').value || '';
+  const out = document.getElementById('login-out');
+  fetchAndPrint(`/login?user=${encodeURIComponent(user)}&pass=${encodeURIComponent(pass)}`, out);
+}
+
+async function runHealth() {
+  const out = document.getElementById('health-out');
+  fetchAndPrint('/health', out);
+}
+</script>
+{% endblock %}
