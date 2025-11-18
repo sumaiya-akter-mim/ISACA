@@ -1,4 +1,4 @@
-# SecChain Analyzer
+# iSACA: Integrated Security Audit Chain Analyzer
 
 An open-source, multi-faceted analyzer that correlates Dynamic (DAST), Static (SAST), and Data-Dump audits to uncover high-risk exploit chains such as SQL Injection leading to weakly stored passwords. Produces a single, actionable report linking vulnerable web parameters, insecure code lines, and weak hash formats.
 
